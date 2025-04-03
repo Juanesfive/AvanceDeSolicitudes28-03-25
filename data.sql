@@ -2,7 +2,7 @@
 CREATE USER IF NOT EXISTS "Juan_adso2894667"@"localhost" IDENTIFIED BY "Aprendiz2025";
 
 #Creamos la base de datos
-CREATE DATABASE node_adso2894667 CHARACTER SET utf8mb4;
+CREATE DATABASE node_adso2894667;
 
 #Asignamos la base de datos al usuario y le damos todos los permisos
 GRANT ALL PRIVILEGES ON node_adso2894667.* TO "Juan_adso2894667"@"localhost";

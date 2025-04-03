@@ -1,55 +1,72 @@
 import connection from "../utils/db.js";
 
-class Categorias {
-  constructor(Nombre, Descripcion) {
-    // this.Nombre = Nombre;
-    // this.Descripcion = Descripcion;
-  }
-  /**
-   * Método para obtener los registros de la base de datos
-   * @returns {Array} Listado de las categorias en un arreglo
-   */
-  async getAll() {
-    try {
-      const [rows] = await connection.query("SELECT * FROM categorias");
-      return rows;
-    } catch (error) {
-      throw new Error("Error al obtener las categorías");
+class Categoria {
+
+    async getAll() {
+        try {
+            const [rows] = await connection.query("SELECT * FROM categorias");
+            return rows;
+        } catch (error) {
+            throw new Error("Error al obtener las categorías");
+        }
     }
-  }
 
-  async create(Nombre, Descripcion) {
-    try {
-      const [result] = await connection.query(
-        "INSERT INTO categorias (nombre, descripcion) VALUES (?,?)",
-        [Nombre, Descripcion]
-      );
-      return {
-        id: result.id,
-        Nombre: Nombre,
-        Descripcion: Descripcion,
-      };
-    } catch (error) {
-      throw new Error("Error al crear la categpría");
+    async create(nombre, descripcion) {
+        try {
+            const [result] = await connection.query("INSERT INTO categorias (nombre, descripcion) VALUES (?, ?)", [nombre, descripcion]);
+            return { id: result.insertId, nombre, descripcion };
+        } catch (error) {
+            throw new Error("Error al crear la categoría");
+        }
     }
-  }
 
-  async update(Nombre, Descripcion, id) {
-    try {
-      console.log("Desde la clase ", Nombre, Descripcion, id);
-      const [result] = await connection.query(
-        "UPDATE categorias SET nombre =? , descripcion =? WHERE id = ? ",
-        [Nombre, Descripcion, id]
-      );
-      if (result.affected === 0) {
-        throw new Error("Categoria no encontrada");
-      }
+    async update(nombre, descripcion, id) {
+        try {
+            const [result] = await connection.query("UPDATE categorias SET nombre = ?, descripcion = ? WHERE id = ?", [nombre, descripcion, id]);
+            if (result.affectedRows === 0) {
+                throw new Error("Categoría no encontrada");
+            }
+            return { id, nombre, descripcion };
+        } catch (error) {
+            throw new Error("Error al actualizar la categoría");
+        }
+    }
 
-      return { id, Nombre: Nombre, Descripcion: Descripcion };
-    } catch (error) {}
+    async patch(id, campos) {
+        try {
+            let sql = "UPDATE categorias SET ";
+            const values = [];
 
-    // update categorias set nombre = "Juan" , descripcion = "el nombre" where id = 6;
-  }
+            Object.keys(campos).forEach((campo, index) => {
+                sql += `${campo} = ?${index < Object.keys(campos).length - 1 ? ", " : " "}`;
+                values.push(campos[campo]);
+            });
+
+            sql += "WHERE id = ?";
+            values.push(id);
+
+            const [result] = await connection.query(sql, values);
+            if (result.affectedRows === 0) {
+                throw new Error("Categoría no encontrada");
+            }
+            return { id, ...campos };
+        } catch (error) {
+            throw new Error("Error al actualizar parcialmente la categoría");
+        }
+    }
+
+    async delete(id) {
+        try {
+            const [result] = await connection.query("DELETE FROM categorias WHERE id = ?", [id]);
+            if (result.affectedRows === 0) {
+                throw new Error("Categoría no encontrada");
+            }
+            return { id };
+        } catch (error) {
+            throw new Error("Error al eliminar la categoría");
+        }
+    }
 }
 
-export default Categorias;
+export default Categoria;
+
