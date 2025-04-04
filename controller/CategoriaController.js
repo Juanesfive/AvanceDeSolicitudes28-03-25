@@ -52,11 +52,12 @@ class CategoriaController {
         try {
             const OBJCategoria = new Categoria();
             const result = await OBJCategoria.delete(id);
-            res.json({ mensaje: "Categoría eliminada correctamente", result });
+            res.json(result);
         } catch (error) {
-            res.status(500).json({ error: "Error al eliminar la categoría" });
+            res.status(400).json({ error: error.message });
         }
     };
+    
 }
 
 export default CategoriaController;
